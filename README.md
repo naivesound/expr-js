@@ -1,5 +1,7 @@
 # expr.js
 
+[![Build Status](https://travis-ci.org/naivesound/expr.js.svg?branch=master)](https://travis-ci.org/naivesound/expr.js)
+
 Fast expression evaluator in JavaScript.
 
 Originally created for http://naivesound.com/glitch to replace the standard
