@@ -1,0 +1,24 @@
+{
+  "name": "expr",
+  "version": "1.0.0",
+  "description": "Fast and small expression evaluation library",
+  "main": "expr.js",
+  "scripts": {
+    "test": "node expr_test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/naivesound/expr.js"
+  },
+  "keywords": [
+    "eval",
+    "math",
+    "expression",
+    "parser"
+  ],
+  "author": "Serge Zaitsev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/naivesound/expr.js/issues"
+  }
+}
