@@ -34,13 +34,13 @@ var ops = {
 	"&": bitwiseAnd, "^": bitwiseXor, "|": bitwiseOr,
 	"&&": logicalAnd, "||": logicalOr,
 	"=": assign, ",": comma,
-}
+};
 
 function isUnary(op) {
 	return op >= unaryMinus && op <= unaryBitwiseNot;
 }
 function isLeftAssoc(op) {
-	return !isUnary(op) && op != assign && op != power && op != comma
+	return !isUnary(op) && op != assign && op != power && op != comma;
 }
 
 function constExpr(value) {
@@ -69,20 +69,21 @@ function unaryExpr(op, arg) {
     } else if (op == unaryLogicalNot) {
       return !arg();
     }
-  }
+  };
 }
 
 function binaryExpr(op, a, b) {
   var f = function() {
+    var c;
     if (op == power) {
       return Math.pow(a(), b());
     } else if (op == multiply) {
       return a() * b();
     } else if (op == divide) {
-      var c = b();
+      c = b();
       return c ? (a() / c) : 0;
     } else if (op == remainder) {
-      var c = b();
+      c = b();
       return c ? (a() % c) : 0;
     } else if (op == plus) {
       return a() + b();
@@ -122,7 +123,7 @@ function binaryExpr(op, a, b) {
   };
   if (op == assign) {
     if (!a.variable) {
-      return // bad variable
+      return; // bad variable
     }
   } else if (op == comma) {
     f.car = a;
@@ -160,20 +161,20 @@ function tokenize(s) {
       continue;
     }
     if (isDigit(c)) {
-      if ((expected & tokNumber) == 0) {
-	return // Unexpected number
+      if ((expected & tokNumber) === 0) {
+	return; // Unexpected number
       }
-      expected = tokOp | tokClose
+      expected = tokOp | tokClose;
       while ((c == '.' || isDigit(c)) && i < s.length) {
 	tok = tok + s.charAt(i);
 	i++;
 	c = s.charAt(i);
       }
     } else if (c >= 'a' && c <= 'z') {
-      if ((expected & tokWord) == 0) {
-	return // ErrUnexpectedWord
+      if ((expected & tokWord) === 0) {
+	return; // ErrUnexpectedWord
       }
-      expected = tokOp | tokOpen | tokClose
+      expected = tokOp | tokOpen | tokClose;
       while ((isLetter(c) || isDigit(c) || c == '_') && i < s.length) {
 	tok = tok + s.charAt(i);
 	i++;
@@ -182,17 +183,17 @@ function tokenize(s) {
     } else if (c == '(' || c == ')') {
       tok = tok + c;
       i++;
-      if (c == '(' && (expected&tokOpen) != 0) {
+      if (c == '(' && (expected&tokOpen) !== 0) {
 	expected = tokNumber | tokWord | tokOpen | tokClose;
-      } else if (c == ')' && (expected&tokClose) != 0) {
+      } else if (c == ')' && (expected&tokClose) !== 0) {
 	expected = tokOp | tokClose;
       } else {
-	return // Bad parens
+	return; // Bad parens
       }
     } else {
-      if ((expected & tokOp) == 0) {
+      if ((expected & tokOp) === 0) {
 	if (c != '-' && c != '^' && c != '!') {
-	  return // ErrOperandMissing
+	  return; // ErrOperandMissing
 	}
 	tok = tok + c + 'u';
 	i++;
@@ -202,7 +203,7 @@ function tokenize(s) {
 	    c != '_' && c != '(' && c != ')' && i < s.length) {
 	  if (ops[tok + s.charAt(i)] > 0) {
 	    tok = tok + s.charAt(i);
-	    lastOp = tok
+	    lastOp = tok;
 	  } else if (!lastOp) {
 	    tok = tok + s.charAt(i);
 	  } else {
@@ -212,14 +213,14 @@ function tokenize(s) {
 	  c = s.charAt(i);
 	}
 	if (!lastOp) {
-	  return //ErrBadOp
+	  return; //ErrBadOp
 	}
       }
-      expected = tokNumber | tokWord | tokOpen
+      expected = tokNumber | tokWord | tokOpen;
     }
     tokens.push(tok);
   }
-  return tokens
+  return tokens;
 }
 
 var parenAllowed = 1;
@@ -244,24 +245,24 @@ function parse(s, vars, funcs) {
     var parenNext = parenAllowed;
     if (token == "(") {
       if (paren == parenExpected) {
-	os.push("{")
+	os.push("{");
       } else if (paren == parenAllowed) {
-	os.push("(")
+	os.push("(");
       } else {
-	return // Bad call
+	return; // Bad call
       }
     } else if (paren == parenExpected) {
-      return // Bad call
+      return; // Bad call
     } else if (token == ")") {
       while (os.length > 0 && os[os.length-1] != "(" && os[os.length-1] != "{") {
-	var expr = bind(os.pop(), funcs, es);
-	if (!expr) {
-	  return
+	var parenExpr = bind(os.pop(), funcs, es);
+	if (!parenExpr) {
+	  return;
 	}
-	es.push(expr);
+	es.push(parenExpr);
       }
-      if (os.length == 0) {
-	return // Bad parens
+      if (os.length === 0) {
+	return; // Bad parens
       }
       if (os.pop() == '{') {
 	var name = os.pop();
@@ -281,60 +282,60 @@ function parse(s, vars, funcs) {
 	  return function() {return f.apply(f, args);};
 	})(f, args));
       }
-      parenNext = parenForbidden
+      parenNext = parenForbidden;
     } else if (!isNaN(parseFloat(token))) {
       // TODO check if parse is correct to avoid 2.3.3
       var n = parseFloat(token);
-      es.push(constExpr(n))
-      parenNext = parenForbidden
+      es.push(constExpr(n));
+      parenNext = parenForbidden;
     } else if (funcs[token]) {
-      os.push(token)
-      parenNext = parenExpected
+      os.push(token);
+      parenNext = parenExpected;
     } else if (ops[token]) {
       var op = ops[token];
       var o2 = os[os.length-1];
-      while (ops[o2] != 0 && ((isLeftAssoc(op) && op >= ops[o2]) || op > ops[o2])) {
+      while (ops[o2] !== 0 && ((isLeftAssoc(op) && op >= ops[o2]) || op > ops[o2])) {
 	var expr = bind(o2, funcs, es);
 	if (!expr) {
 	  return;
 	}
-	es.push(expr)
-	os.pop()
+	es.push(expr);
+	os.pop();
 	o2 = os[os.length-1];
       }
-      os.push(token)
+      os.push(token);
     } else {
       // Variable
       if (vars[token]) {
 	es.push(vars[token]);
       } else {
 	var v = varExpr(0);
-	vars[token] = v
-	es.push(v)
+	vars[token] = v;
+	es.push(v);
       }
-      parenNext = parenForbidden
+      parenNext = parenForbidden;
     }
-    paren = parenNext
+    paren = parenNext;
   }
 
   if (paren == parenExpected) {
-    return  // Bad call
+    return; // Bad call
   }
   while (os.length > 0) {
-    var op = os.pop()
-    if (op == "(" || op == ")") {
-      return // Bad paren
+    var rest = os.pop();
+    if (rest == "(" || rest == ")") {
+      return; // Bad paren
     }
-    var expr = bind(op, funcs, es)
-    if (!expr) {
+    var restExpr = bind(rest, funcs, es);
+    if (!restExpr) {
       return;
     }
-    es.push(expr)
+    es.push(restExpr);
   }
-  if (es.length == 0) {
+  if (es.length === 0) {
     return constExpr(0);
   } else {
-    return es.pop()
+    return es.pop();
   }
 }
 
@@ -342,20 +343,20 @@ function bind(name, funcs, stack) {
   if (ops[name]) {
     if (isUnary(ops[name])) {
       if (stack[stack.length - 1] === undefined) {
-	return // Operand missing
+	return; // Operand missing
       } else {
-	return unaryExpr(ops[name], stack.pop())
+	return unaryExpr(ops[name], stack.pop());
       }
     } else {
-      var b = stack.pop()
-      var a = stack.pop()
+      var b = stack.pop();
+      var a = stack.pop();
       if (a === undefined || b === undefined) {
-	return  // Binary operand missing
+	return; // Binary operand missing
       }
-      return binaryExpr(ops[name], a, b)
+      return binaryExpr(ops[name], a, b);
     }
   } else {
-    return // Bad call
+    return; // Bad call
   }
 }
 
