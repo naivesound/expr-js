@@ -10,7 +10,7 @@ Originally created for http://naivesound.com/glitch to replace the standard
 ## Install
 
 ```
-npm install expreval
+npm install github:naivesound/expr-js
 ```
 
 ## Example
