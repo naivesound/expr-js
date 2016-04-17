@@ -1,5 +1,5 @@
 {
-  "name": "expreval",
+  "name": "expr",
   "version": "1.0.0",
   "description": "Fast and small expression evaluation library",
   "main": "expr.js",
