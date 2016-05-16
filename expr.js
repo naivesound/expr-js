@@ -278,9 +278,9 @@ function parse(s, vars, funcs) {
 	    break;
 	  }
 	}
-	es.push((function(f, args){
-	  return function() {return f.apply(f, args);};
-	})(f, args));
+	es.push((function(f, args, context) {
+	  return function() {return f.apply(context, args);};
+	})(f, args, {}));
       }
       parenNext = parenForbidden;
     } else if (!isNaN(parseFloat(token))) {

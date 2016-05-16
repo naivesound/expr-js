@@ -93,6 +93,14 @@ function testFunc() {
   });
 }
 
+function testFuncContext() {
+  var incr = function(x) {
+    this.value = (this.value||0) + x();
+    return this.value;
+  };
+  test({"incr(3)+incr(2)":5}, {}, {incr: incr})
+}
+
 function testParseErrors() {
   test({
     "(": undefined,
@@ -136,6 +144,7 @@ testBinary();
 testComma();
 testAssign();
 testFunc();
+testFuncContext();
 
 testParseErrors();
 
