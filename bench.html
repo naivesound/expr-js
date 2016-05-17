@@ -1,0 +1,11 @@
+<html>
+	<body>
+		<script>var module = {};</script>
+		<script src="expr.js"></script>
+		<script>
+			var expr = module.exports;
+			function require() { return expr; }
+		</script>
+		<script src="expr_bench.js"></script>
+	</body>
+</html>

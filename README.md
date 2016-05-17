@@ -114,6 +114,33 @@ a=2+3   -> 5, also puts "5" into variable "a"
 a=2+3,a=a+1,a*2  -> 12 (sequential execution, returns last retult)
 ```
 
+## Performance
+
+Node performance of the native `eval` seems to be pretty good (because JIT
+knows that I'm going to evaluate the same constant string many times), but
+browsers are still very slow.
+
+Here's the results of parsing and evaluating one expression (28 chars), ten
+expressions contatenated into one and 100 expressions concatenated into one
+(~3k chars).
+
+```
+parse   1 0.0288
+parse  10 0.2023
+parse 100 1.9551
+eval   1 0.0009
+eval  10 0.003
+eval 100 0.0316
+native   1 0.075
+native  10 0.2015
+native 100 1.116
+```
+
+Parsing is not so fast, but evaluation of the compiled expressions beats
+browser's `eval` by at least 30 times. Also remember that `eval` can be
+insecure, while `expr` narrows down the scope to a list of allowed functions
+and variables.
+
 ## License
 
 Code is distributed under MIT license, feel free to use it in your proprietary projects as well.
