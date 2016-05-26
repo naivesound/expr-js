@@ -7,8 +7,8 @@ function bench(name, n, iter, evaluate) {
   for (var i = 0; i < n; i++) {
     s = s + ',' + formula;
   }
-  var incr = function(x) {
-    this.value = (this.value||0) + x();
+  var incr = function(args) {
+    this.value = (this.value||0) + args[0]();
     return this.value;
   };
   var vars = {};
@@ -47,13 +47,13 @@ function nativeBench(name, n, iter) {
   console.log(name, (new Date().getTime() - start) / iter);
 }
 
-//bench('parse   1', 1, 10000, false);
-//bench('parse  10', 10, 10000, false);
-//bench('parse 100', 100, 10000, false);
+bench('parse   1', 1, 10000, false);
+bench('parse  10', 10, 10000, false);
+bench('parse 100', 100, 10000, false);
 
-//bench('eval   1', 1, 10000, true);
-//bench('eval  10', 10, 10000, true);
-//bench('eval 100', 100, 10000, true);
+bench('eval   1', 1, 10000, true);
+bench('eval  10', 10, 10000, true);
+bench('eval 100', 100, 10000, true);
 
 nativeBench('native   1', 1, 100);
 nativeBench('native  10', 10, 10000);

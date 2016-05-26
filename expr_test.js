@@ -87,15 +87,15 @@ function testFunc() {
     "nop(1)":   0,
     "nop((1))": 0,
   }, {}, {
-    "add3": function(a, b, c) { return a()+b()+c(); },
+    "add3": function(args) { return args[0]()+args[1]()+args[2](); },
     "nop": function() {return 0;},
-    "next": function(n) {return n()+1;},
+    "next": function(args) {return args[0]()+1;},
   });
 }
 
 function testFuncContext() {
-  var incr = function(x) {
-    this.value = (this.value||0) + x();
+  var incr = function(args) {
+    this.value = (this.value||0) + args[0]();
     return this.value;
   };
   test({"incr(3)+incr(2)":5}, {}, {incr: incr})
