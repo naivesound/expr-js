@@ -230,6 +230,7 @@ var parenForbidden = 3;
 function parse(s, vars, funcs) {
   var os = [];
   var es = [];
+  var as = [];
 
   vars = vars || {};
   funcs = funcs || {};
@@ -245,8 +246,8 @@ function parse(s, vars, funcs) {
     var parenNext = parenAllowed;
     if (token == "(") {
       if (paren == parenExpected) {
+	as.push({osp: os.length, esp: es.length, args: []});
 	os.push("{");
-	es.push(undefined);
       } else if (paren == parenAllowed) {
 	os.push("(");
       } else {
@@ -255,7 +256,8 @@ function parse(s, vars, funcs) {
     } else if (paren == parenExpected) {
       return; // Bad call
     } else if (token == ")") {
-      while (os.length > 0 && os[os.length-1] != "(" && os[os.length-1] != "{" && es[es.length-1]) {
+      var minLength = (as.length > 0 ? as[as.length-1].osp : 0);
+      while (os.length > minLength && os[os.length-1] != "(" && os[os.length-1] != "{") {
 	var parenExpr = bind(os.pop(), funcs, es);
 	if (!parenExpr) {
 	  return;
@@ -268,19 +270,10 @@ function parse(s, vars, funcs) {
       if (os.pop() == '{') {
 	var name = os.pop();
 	var f = funcs[name];
-	var args = [];
-	var e = es.pop();
-	if (e) {
-	  while (e) {
-	    if (e.car) {
-	      args.push(e.car);
-	      e = e.cdr;
-	    } else {
-	      args.push(e);
-	      break;
-	    }
-	  }
-	  es.pop();
+	var a = as.pop();
+	var args = a.args;
+	if (es.length > a.esp) {
+	  args.push(es.pop());
 	}
 	es.push(f.bind({}, args))
       }
@@ -294,18 +287,22 @@ function parse(s, vars, funcs) {
       os.push(token);
       parenNext = parenExpected;
     } else if (ops[token]) {
-      var op = ops[token];
-      var o2 = os[os.length-1];
-      while (ops[o2] !== 0 && ((isLeftAssoc(op) && op >= ops[o2]) || op > ops[o2])) {
-	var expr = bind(o2, funcs, es);
-	if (!expr) {
-	  return;
+      if (token == ',' && os.length > 0 && os[os.length-1] == '{') {
+	as[as.length-1].args.push(es.pop())
+      } else {
+	var op = ops[token];
+	var o2 = os[os.length-1];
+	while (ops[o2] !== 0 && ((isLeftAssoc(op) && op >= ops[o2]) || op > ops[o2])) {
+	  var expr = bind(o2, funcs, es);
+	  if (!expr) {
+	    return;
+	  }
+	  es.push(expr);
+	  os.pop();
+	  o2 = os[os.length-1];
 	}
-	es.push(expr);
-	os.pop();
-	o2 = os[os.length-1];
+	os.push(token);
       }
-      os.push(token);
     } else {
       // Variable
       if (vars[token]) {
