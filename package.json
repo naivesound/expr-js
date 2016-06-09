@@ -1,6 +1,6 @@
 {
   "name": "expr",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Fast and small expression evaluation library",
   "main": "expr.js",
   "scripts": {
