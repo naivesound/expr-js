@@ -246,6 +246,7 @@ function parse(s, vars, funcs) {
     if (token == "(") {
       if (paren == parenExpected) {
 	os.push("{");
+	es.push(undefined);
       } else if (paren == parenAllowed) {
 	os.push("(");
       } else {
@@ -254,7 +255,7 @@ function parse(s, vars, funcs) {
     } else if (paren == parenExpected) {
       return; // Bad call
     } else if (token == ")") {
-      while (os.length > 0 && os[os.length-1] != "(" && os[os.length-1] != "{") {
+      while (os.length > 0 && os[os.length-1] != "(" && os[os.length-1] != "{" && es[es.length-1]) {
 	var parenExpr = bind(os.pop(), funcs, es);
 	if (!parenExpr) {
 	  return;
@@ -267,16 +268,19 @@ function parse(s, vars, funcs) {
       if (os.pop() == '{') {
 	var name = os.pop();
 	var f = funcs[name];
-	var e = es.pop();
 	var args = [];
-	while (e) {
-	  if (e.car) {
-	    args.push(e.car);
-	    e = e.cdr;
-	  } else {
-	    args.push(e);
-	    break;
+	var e = es.pop();
+	if (e) {
+	  while (e) {
+	    if (e.car) {
+	      args.push(e.car);
+	      e = e.cdr;
+	    } else {
+	      args.push(e);
+	      break;
+	    }
 	  }
+	  es.pop();
 	}
 	es.push(f.bind({}, args))
       }

@@ -86,6 +86,7 @@ function testFunc() {
     "nop()":    0,
     "nop(1)":   0,
     "nop((1))": 0,
+    "1,nop()": 0,
   }, {}, {
     "add3": function(args) { return args[0]()+args[1]()+args[2](); },
     "nop": function() {return 0;},
