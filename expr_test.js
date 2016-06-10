@@ -120,6 +120,8 @@ function testParseErrors() {
     '1)': undefined,
     '2=3': undefined,
     '2@3': undefined,
+    '2.3.3': undefined,
+    '4ever': undefined,
 
     '1()': undefined,
     ',f(x)': undefined,

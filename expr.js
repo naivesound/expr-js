@@ -278,7 +278,7 @@ function parse(s, vars, funcs) {
         es.push(f.bind({}, args));
       }
       parenNext = parenForbidden;
-    } else if (!isNaN(parseFloat(token))) {
+    } else if (!isNaN(token)) {
       // TODO check if parse is correct to avoid 2.3.3
       var n = parseFloat(token);
       es.push(constExpr(n));
@@ -303,7 +303,7 @@ function parse(s, vars, funcs) {
         }
         os.push(token);
       }
-    } else {
+    } else if (token.match(/^\D/)) {
       // Variable
       if (vars[token]) {
         es.push(vars[token]);
@@ -313,6 +313,8 @@ function parse(s, vars, funcs) {
         es.push(v);
       }
       parenNext = parenForbidden;
+    } else {
+      return; // Bad variable name, e.g. '2.3.4' or '4ever'
     }
     paren = parenNext;
   }
