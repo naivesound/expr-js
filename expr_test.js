@@ -83,6 +83,9 @@ function testFunc() {
     'next(next(4))':       6,
     'next((2,4))':         5,
     'next(1, (2,4))':      2,
+    'next(3*2)':    7,
+    'next(3*2, 2)':    7,
+    'next(3*2, (2,4))':    7,
     'next((2,4),1)':       5,
     '2+add3(3, add3(1, 2, 3), 9)': 20,
 
@@ -92,6 +95,7 @@ function testFunc() {
     'nop(1)':   0,
     'nop((1))': 0,
     '1,nop()': 0,
+    '1,nop(),2': 2,
   }, {}, {
     'add3': function(args) { return args[0]()+args[1]()+args[2](); },
     'nop': function() {return 0;},

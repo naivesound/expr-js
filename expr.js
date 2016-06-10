@@ -279,7 +279,6 @@ function parse(s, vars, funcs) {
       }
       parenNext = parenForbidden;
     } else if (!isNaN(token)) {
-      // TODO check if parse is correct to avoid 2.3.3
       var n = parseFloat(token);
       es.push(constExpr(n));
       parenNext = parenForbidden;
@@ -287,21 +286,24 @@ function parse(s, vars, funcs) {
       os.push(token);
       parenNext = parenExpected;
     } else if (ops[token]) {
-      if (token == ',' && os.length > 0 && os[os.length-1] == '{') {
-        as[as.length-1].args.push(es.pop());
-      } else {
-        var op = ops[token];
-        var o2 = os[os.length-1];
-        while (ops[o2] !== 0 && ((isLeftAssoc(op) && op >= ops[o2]) || op > ops[o2])) {
-          var expr = bind(o2, funcs, es);
-          if (!expr) {
-            return;
-          }
-          es.push(expr);
-          os.pop();
-          o2 = os[os.length-1];
+      var op = ops[token];
+      var o2 = os[os.length-1];
+      for (;;) {
+        if (token == ',' && os.length > 0 && os[os.length-1] == '{') {
+          as[as.length-1].args.push(es.pop());
+          break;
         }
-        os.push(token);
+        if (!(ops[o2] !== 0 && ((isLeftAssoc(op) && op >= ops[o2]) || op > ops[o2]))) {
+          os.push(token);
+          break;
+        }
+        var expr = bind(o2, funcs, es);
+        if (!expr) {
+          return;
+        }
+        es.push(expr);
+        os.pop();
+        o2 = os[os.length-1];
       }
     } else if (token.match(/^\D/)) {
       // Variable
