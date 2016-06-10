@@ -154,23 +154,4 @@ testFuncContext();
 
 testParseErrors();
 
-// Call this functions to get a random list of valid expressions
-function testFuzz() {
-  var funcs = {'f': function() { return 1; }};
-  var sym = '()+,1x>=f*';
-  var set = {};
-  for (var i = 0; i < 100000; i++) {
-    var s = '';
-    var l = Math.random() * 100;
-    for (var x = 0; x < l; x++) {
-      s = s + sym[0|(Math.random()*sym.length)];
-    }
-    var e = expr.parse(s, {}, funcs);
-    if (e && !set[s])  {
-      set[s] = true;
-      console.log(s);
-    }
-  }
-}
-
 process.exit(exitcode);
